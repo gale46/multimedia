@@ -77,11 +77,18 @@ def hand_pos(finger_angle):
     elif f1 < 50 and f2 <50 and f3<50 and f4<50 and f5<50:#手指全部伸直
         return 2
 
-def show(text):
-    cv2.putText(img, text, (50, 170), fontFace, 5, (255, 255, 255), 10, lineType)  # 印出文字
-    cv2.imshow('oxxostudio', img)
-    cv2.waitKey(100)
+def show(text, morse_str):
+    image = np.zeros((480, 640, 3), np.uint8)
+    # Fill image with gray color(set each pixel to gray)
+    image[:] = (255, 255, 255)
+    cv2.putText(image, morse_str, (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+      1, (0, 0, 0), 1, cv2.LINE_AA)
     
+    morse = "morse: "+ text
+    cv2.putText(image, morse, (300, 50), cv2.FONT_HERSHEY_SIMPLEX,
+      1, (0, 0, 0), 1   , cv2.LINE_AA)
+    cv2.imshow('Result', image)
+        
 cap = cv2.VideoCapture(0)            # 讀取攝影機
 fontFace = cv2.FONT_HERSHEY_SIMPLEX  # 印出文字的字型
 lineType = cv2.LINE_AA               # 印出文字的邊框
@@ -116,7 +123,7 @@ with mp_hands.Hands(
             break
         img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # 轉換成 RGB 色彩
         current_time = time.time()
-        if current_time - last_time > 1:#每一秒偵測一次
+        if current_time - last_time > 1.5:#每一秒偵測一次
             last_time = current_time
             results = hands.process(img2)                # 偵測手勢
             if results.multi_hand_landmarks:
@@ -133,16 +140,16 @@ with mp_hands.Hands(
                         print("text",text)
                         if text != 2 and text != None:#手勢判斷加入list
                             morse.append(text)
-                            show(str(text))
+                            show('', str(text))
                         else:
                             morse_str = ''.join(str(i) for i in morse)
                             print("morse_str", morse_str) 
                             if morse_str in morse_code_dict:#輸出判斷
                                 output = morse_code_dict[morse_str]
                                 print("output", output)
-                                show(output)
+                                show(output, morse_str)
                             else:
-                                print("undefine")
+                                show("None",'')
                             morse.clear()
                     
         cv2.imshow('oxxostudio', img)
