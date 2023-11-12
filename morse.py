@@ -1,3 +1,4 @@
+import numpy as np
 import cv2
 import mediapipe as mp
 import math
@@ -63,22 +64,24 @@ def hand_pos(finger_angle):
     f4 = finger_angle[3]   # 無名指角度
     f5 = finger_angle[4]   # 小拇指角度
     # 小於 50 表示手指伸直，大於等於 50 表示手指捲縮
-    if f1<50 and f2>=50 and f3>=50 and f4>=50 and f5>=50:
+    if f1<50 and f2>=50 and f3>=50 and f4>=50 and f5>=50:#短
         #if current_time - last_time > 100:
             #last_time = current_time
         #time.sleep(1)
         return 0
-    elif f1>=50 and f2<50 and f3>=50 and f4>=50 and f5>=50:
+    elif f1>=50 and f2<50 and f3>=50 and f4>=50 and f5>=50:#長
        # if current_time - last_time > 100:
            # last_time = current_time
         #time.sleep(1)
         return 1
-    elif f1 < 50 and f2 <50 and f3<50 and f4<50 and f5<50:
+    elif f1 < 50 and f2 <50 and f3<50 and f4<50 and f5<50:#手指全部伸直
         return 2
-    #else:
-        #if current_time - last_time > 100:
-           # last_time = current_time
-        #return 3
+
+def show(text):
+    cv2.putText(img, text, (50, 170), fontFace, 5, (255, 255, 255), 10, lineType)  # 印出文字
+    cv2.imshow('oxxostudio', img)
+    cv2.waitKey(100)
+    
 cap = cv2.VideoCapture(0)            # 讀取攝影機
 fontFace = cv2.FONT_HERSHEY_SIMPLEX  # 印出文字的字型
 lineType = cv2.LINE_AA               # 印出文字的邊框
@@ -130,18 +133,18 @@ with mp_hands.Hands(
                         print("text",text)
                         if text != 2 and text != None:#手勢判斷加入list
                             morse.append(text)
+                            show(str(text))
                         else:
                             morse_str = ''.join(str(i) for i in morse)
-                            print("morse_str", morse_str)
-
+                            print("morse_str", morse_str) 
                             if morse_str in morse_code_dict:#輸出判斷
                                 output = morse_code_dict[morse_str]
                                 print("output", output)
-                                cv2.putText(img, output, (30,120), fontFace, 5, (255,255,255), 10, lineType) # 印出文字
+                                show(output)
                             else:
                                 print("undefine")
                             morse.clear()
-
+                    
         cv2.imshow('oxxostudio', img)
         if cv2.waitKey(5) == ord('q'):
             break
